@@ -17,7 +17,28 @@ body{font-family:'Poppins',sans-serif;}
 <p>Trusted Real Estate Services</p>
 <p>Kanpur | Lucknow | Fatehpur | Banda | Hamirpur</p>
 </header>
-<div class="search-box">
+<div class="search-box"><div style="text-align:center; margin:20px;">
+
+<select id="cityFilter">
+  <option value="">Select City</option>
+  <option>Kanpur</option>
+  <option>Lucknow</option>
+  <option>Fatehpur</option>
+  <option>Banda</option>
+  <option>Hamirpur</option>
+</select>
+
+<select id="typeFilter">
+  <option value="">Property Type</option>
+  <option>Plot</option>
+  <option>House</option>
+  <option>Flat</option>
+  <option>Commercial</option>
+</select>
+
+<button onclick="filterProperty()">Filter</button>
+
+</div>
   <input type="text" id="search" placeholder="Search by city or area">
   <button onclick="searchProperty()">Search</button>
 </div>
