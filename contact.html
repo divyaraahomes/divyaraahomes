@@ -1,38 +1,55 @@
 <h2>Property Inquiry Form</h2>
 
-<form action="mailto:divyaraahomes@gmail.com" method="post">
+<form onsubmit="sendWhatsApp(); return false;">
 
-<label>Name:</label><br>
-<input type="text" name="name" required><br><br>
+<input id="name" placeholder="Name" required><br><br>
+<input id="mobile" placeholder="Mobile" required><br><br>
 
-<label>Mobile Number:</label><br>
-<input type="text" name="mobile" required><br><br>
-
-<label>Property Type:</label><br>
-<select name="type">
-  <option>Plot / Land</option>
-  <option>House</option>
-  <option>Flat</option>
-  <option>Shop / Commercial</option>
-  <option>Farm Land</option>
+<select id="type">
+<option>Plot / Land</option>
+<option>House</option>
+<option>Flat</option>
+<option>Shop / Commercial</option>
+<option>Farm Land</option>
 </select><br><br>
 
-<label>Purpose:</label><br>
-<select name="purpose">
-  <option>Buy</option>
-  <option>Sell</option>
-  <option>Rent</option>
+<select id="purpose">
+<option>Buy</option>
+<option>Sell</option>
+<option>Rent</option>
 </select><br><br>
 
-<label>Preferred Area / Location:</label><br>
-<input type="text" name="area"><br><br>
+<input id="area" placeholder="Preferred Area"><br><br>
+<input id="budget" placeholder="Budget"><br><br>
 
-<label>Budget (Approx):</label><br>
-<input type="text" name="budget"><br><br>
+<textarea id="msg" placeholder="Message"></textarea><br><br>
 
-<label>Your Message:</label><br>
-<textarea name="message" rows="4"></textarea><br><br>
-
-<button type="submit">Submit Inquiry</button>
+<button type="submit">Send on WhatsApp</button>
 
 </form>
+
+<script>
+function sendWhatsApp(){
+
+let name = document.getElementById("name").value;
+let mobile = document.getElementById("mobile").value;
+let type = document.getElementById("type").value;
+let purpose = document.getElementById("purpose").value;
+let area = document.getElementById("area").value;
+let budget = document.getElementById("budget").value;
+let msg = document.getElementById("msg").value;
+
+let text =
+"New Inquiry%0A"+
+"Name: "+name+"%0A"+
+"Mobile: "+mobile+"%0A"+
+"Type: "+type+"%0A"+
+"Purpose: "+purpose+"%0A"+
+"Area: "+area+"%0A"+
+"Budget: "+budget+"%0A"+
+"Message: "+msg;
+
+window.open("https://wa.me/917706917829?text="+text);
+
+}
+</script>
