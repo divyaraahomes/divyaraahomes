@@ -44,3 +44,17 @@ color:white;
 text-align:center;
 padding:15px;
 }
+.card{
+  border:1px solid #ccc;
+  width:250px;
+  padding:10px;
+  margin:10px;
+  display:inline-block;
+}
+.card img{
+  width:100%;
+}
+.search-box{
+  text-align:center;
+  margin:20px;
+}
