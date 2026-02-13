@@ -1,12 +1,38 @@
-<h2>Send Inquiry</h2>
+<h2>Property Inquiry Form</h2>
 
 <form action="mailto:divyaraahomes@gmail.com" method="post">
 
-<input name="name" placeholder="Name"><br><br>
-<input name="phone" placeholder="Mobile"><br><br>
+<label>Name:</label><br>
+<input type="text" name="name" required><br><br>
 
-<textarea name="msg" placeholder="Your Message"></textarea><br><br>
+<label>Mobile Number:</label><br>
+<input type="text" name="mobile" required><br><br>
 
-<button type="submit">Send</button>
+<label>Property Type:</label><br>
+<select name="type">
+  <option>Plot / Land</option>
+  <option>House</option>
+  <option>Flat</option>
+  <option>Shop / Commercial</option>
+  <option>Farm Land</option>
+</select><br><br>
+
+<label>Purpose:</label><br>
+<select name="purpose">
+  <option>Buy</option>
+  <option>Sell</option>
+  <option>Rent</option>
+</select><br><br>
+
+<label>Preferred Area / Location:</label><br>
+<input type="text" name="area"><br><br>
+
+<label>Budget (Approx):</label><br>
+<input type="text" name="budget"><br><br>
+
+<label>Your Message:</label><br>
+<textarea name="message" rows="4"></textarea><br><br>
+
+<button type="submit">Submit Inquiry</button>
 
 </form>
