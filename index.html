@@ -1,15 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DIVYARAA HOMES | Luxury Real Estate</title>
 
-<meta name="description" content="DIVYARAA HOMES - Premium Real Estate Services in Kanpur, Lucknow, Fatehpur, Banda & Hamirpur. Buy, Sell & Invest with Trust.">
+<title>DIVYARAA HOMES | Premium Real Estate India</title>
+
+<meta name="description" content="DIVYARAA HOMES - Trusted Luxury Property Advisors in Kanpur, Lucknow, Fatehpur, Banda & Hamirpur. Buy, Sell & Invest Safely.">
+
+<meta name="keywords" content="Divyaraa Homes, Property in Kanpur, Real Estate UP, Buy Plot, House, Commercial Property">
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
+
+/* BASE */
 
 *{
 margin:0;
@@ -24,7 +30,8 @@ background:#0b0f19;
 color:#fff;
 }
 
-/* TOPBAR */
+/* TOP BAR */
+
 .topbar{
 position:fixed;
 top:0;
@@ -39,6 +46,7 @@ z-index:9999;
 }
 
 /* NAV */
+
 nav{
 position:sticky;
 top:40px;
@@ -53,6 +61,7 @@ z-index:999;
 nav a{
 color:white;
 font-weight:600;
+text-decoration:none;
 transition:.3s;
 }
 
@@ -61,6 +70,7 @@ color:gold;
 }
 
 /* HERO */
+
 .hero{
 height:100vh;
 background:
@@ -95,9 +105,11 @@ border-radius:6px;
 font-weight:600;
 margin-top:15px;
 display:inline-block;
+text-decoration:none;
 }
 
 /* SECTION */
+
 section{
 padding:80px 10%;
 }
@@ -110,6 +122,7 @@ color:gold;
 }
 
 /* GRID */
+
 .grid{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
@@ -139,21 +152,38 @@ padding:20px;
 }
 
 /* FOUNDER */
+
 .founder{
-background:#111827;
+background:#0f172a;
 text-align:center;
 }
 
 .founder img{
-width:150px;
-height:150px;
+width:180px;
+height:180px;
 border-radius:50%;
-border:4px solid gold;
-margin:20px;
+border:6px solid gold;
+box-shadow:0 0 25px rgba(255,215,0,0.8);
 object-fit:cover;
+margin:20px 0;
+}
+
+/* ABOUT */
+
+.about{
+background:#111827;
+text-align:center;
+}
+
+.about p{
+max-width:800px;
+margin:auto;
+line-height:1.8;
+font-size:17px;
 }
 
 /* TESTIMONIAL */
+
 .testimonial{
 background:#0f172a;
 text-align:center;
@@ -161,11 +191,21 @@ text-align:center;
 
 .review{
 background:#111827;
-padding:20px;
+padding:25px;
 border-radius:12px;
 }
 
+/* MAP */
+
+.map iframe{
+width:100%;
+height:350px;
+border-radius:15px;
+border:0;
+}
+
 /* CONTACT */
+
 .contact{
 text-align:center;
 background:#111827;
@@ -180,6 +220,7 @@ border:none;
 }
 
 /* FOOTER */
+
 footer{
 background:#000;
 text-align:center;
@@ -187,7 +228,8 @@ padding:20px;
 color:#aaa;
 }
 
-/* FLOAT BUTTONS */
+/* FLOAT BUTTON */
+
 .whatsapp,.call{
 position:fixed;
 bottom:20px;
@@ -202,30 +244,46 @@ z-index:999;
 .call{left:20px;background:#007BFF;}
 
 </style>
+
 </head>
 
 <body>
+
+<!-- TOP -->
 
 <div class="topbar">
 DIVYARAA HOMES – Trusted Luxury Real Estate
 </div>
 
+<!-- NAV -->
+
 <nav>
 <a href="#home">Home</a>
 <a href="#properties">Properties</a>
 <a href="#about">About</a>
+<a href="#founder">Founder</a>
 <a href="#reviews">Reviews</a>
 <a href="#contact">Contact</a>
 </nav>
 
+<!-- HERO -->
+
 <div class="hero" id="home">
+
 <h1>DIVYARAA HOMES</h1>
+
 <p>Kanpur | Lucknow | Fatehpur | Banda | Hamirpur</p>
-<p>Luxury Property Advisory & Investment Solutions</p>
+
+<p>Premium Property & Investment Advisory</p>
+
 <a href="#contact" class="btn">Book Consultation</a>
+
 </div>
 
+<!-- PROPERTIES -->
+
 <section id="properties">
+
 <h2 class="section-title">Premium Properties</h2>
 
 <div class="grid">
@@ -235,7 +293,7 @@ DIVYARAA HOMES – Trusted Luxury Real Estate
 <div class="card-content">
 <h3>Residential Plot – Kanpur</h3>
 <p>₹12 Lakh</p>
-<a href="https://wa.me/917706917829" class="btn">Enquire</a>
+<a href="#" class="btn">Enquire</a>
 </div>
 </div>
 
@@ -244,7 +302,7 @@ DIVYARAA HOMES – Trusted Luxury Real Estate
 <div class="card-content">
 <h3>Luxury House – Lucknow</h3>
 <p>₹45 Lakh</p>
-<a href="https://wa.me/917706917829" class="btn">Enquire</a>
+<a href="#" class="btn">Enquire</a>
 </div>
 </div>
 
@@ -253,59 +311,121 @@ DIVYARAA HOMES – Trusted Luxury Real Estate
 <div class="card-content">
 <h3>Commercial Shop – Banda</h3>
 <p>₹22 Lakh</p>
-<a href="https://wa.me/917706917829" class="btn">Enquire</a>
+<a href="#" class="btn">Enquire</a>
 </div>
 </div>
 
 </div>
+
 </section>
 
-<section class="founder" id="about">
-<h2 class="section-title">Founder & Vision</h2>
-<img src="founder.jpg" alt="Founder Brijendra Chakraborty" style="
-width:180px;
-height:180px;
-border-radius:50%;
-border:6px solid gold;
-box-shadow:0 0 25px rgba(255,215,0,0.8);
-object-fit:cover;
-margin:20px 0;
-">
-<h3>Brijendra Singh Chakraborty</h3>
-<p style="max-width:700px;margin:auto;">
-Delivering transparent and premium real estate solutions.
-Our mission is to help families build wealth through trusted property investments.
+<!-- ABOUT -->
+
+<section class="about" id="about">
+
+<h2 class="section-title">About Us</h2>
+
+<p>
+
+DIVYARAA HOMES is built on trust, honesty, and professionalism.  
+We help families and investors build wealth through verified and safe property deals.
+
+<br><br>
+
+Our focus is long-term relationships, transparent documentation, and premium service.
+
 </p>
+
 </section>
+
+<!-- FOUNDER -->
+
+<section class="founder" id="founder">
+
+<h2 class="section-title">Founder & Vision</h2>
+
+<img src="founder.jpg">
+
+<h3>Brijendra Singh Chakraborty</h3>
+
+<p>
+
+Founder of Divyaraa Homes, delivering reliable and transparent property solutions.
+
+<br><br>
+
+Mission: Helping families own safe & valuable assets.
+
+</p>
+
+</section>
+
+<!-- REVIEWS -->
 
 <section class="testimonial" id="reviews">
-<h2 class="section-title">Client Testimonials</h2>
+
+<h2 class="section-title">Client Reviews</h2>
+
 <div class="grid">
-<div class="review">"Highly professional and trustworthy service." – Rahul Verma</div>
-<div class="review">"Best property advisor in UP." – Sandeep Mishra</div>
-<div class="review">"Smooth deal & full support till registry." – Amit Singh</div>
+
+<div class="review">"Highly professional and trustworthy service."</div>
+
+<div class="review">"Best property advisor in UP."</div>
+
+<div class="review">"Smooth deal & full support."</div>
+
 </div>
+
 </section>
 
+<!-- MAP -->
+
+<section class="map">
+
+<h2 class="section-title">Our Office</h2>
+
+<iframe 
+src="https://www.google.com/maps?q=Naubasta%20Kanpur&output=embed">
+</iframe>
+
+</section>
+
+<!-- CONTACT -->
+
 <section class="contact" id="contact">
+
 <h2 class="section-title">Contact Us</h2>
+
 <p>📞 7706917829 / 7755864651</p>
+
 <p>📧 divyaraahomes@gmail.com</p>
 
-<form action="mailto:divyaraahomes@gmail.com" method="post" enctype="text/plain">
-<input type="text" name="Name" placeholder="Your Name" required>
-<input type="text" name="Mobile" placeholder="Mobile Number" required>
-<textarea name="Message" rows="4" placeholder="Your Requirement"></textarea>
-<button type="submit" class="btn">Send Enquiry</button>
+<form>
+
+<input type="text" placeholder="Name" required>
+
+<input type="text" placeholder="Mobile" required>
+
+<textarea rows="4" placeholder="Requirement"></textarea>
+
+<button class="btn">Send Enquiry</button>
+
 </form>
 
 </section>
 
+<!-- FOOTER -->
+
 <footer>
+
 © 2026 DIVYARAA HOMES | All Rights Reserved
+
 </footer>
 
+<!-- FLOAT -->
+
 <a href="https://wa.me/917706917829" class="whatsapp">💬</a>
+
 <a href="tel:+917706917829" class="call">📞</a>
 
 </body>
