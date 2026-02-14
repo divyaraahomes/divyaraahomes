@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DIVYARAA HOMES | Trusted Real Estate Services</title>
+<title>DIVYARAA HOMES | Luxury Real Estate</title>
 
-<meta name="description" content="DIVYARAA HOMES - Trusted Real Estate Services in Kanpur, Lucknow, Fatehpur, Banda & Hamirpur. Buy, Sell & Invest in Premium Properties.">
+<meta name="description" content="DIVYARAA HOMES - Premium Real Estate Services in Kanpur, Lucknow, Fatehpur, Banda & Hamirpur. Buy, Sell & Invest with Trust.">
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
@@ -20,11 +20,11 @@ scroll-behavior:smooth;
 }
 
 body{
-background:#f4f6f9;
-color:#333;
+background:#0b0f19;
+color:#fff;
 }
 
-/* TOP HEADER */
+/* TOPBAR */
 .topbar{
 position:fixed;
 top:0;
@@ -34,14 +34,15 @@ color:gold;
 text-align:center;
 padding:10px;
 font-weight:600;
+letter-spacing:1px;
 z-index:9999;
 }
 
-/* NAVIGATION */
+/* NAV */
 nav{
 position:sticky;
 top:40px;
-background:#111;
+background:#111827;
 display:flex;
 justify-content:center;
 gap:30px;
@@ -52,116 +53,141 @@ z-index:999;
 nav a{
 color:white;
 font-weight:600;
+transition:.3s;
+}
+
+nav a:hover{
+color:gold;
 }
 
 /* HERO */
 .hero{
 height:100vh;
 background:
-linear-gradient(rgba(0,0,0,.6),rgba(0,0,0,.6)),
+linear-gradient(rgba(0,0,0,.7),rgba(0,0,0,.7)),
 url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c');
 background-size:cover;
 background-position:center;
 display:flex;
 flex-direction:column;
-align-items:center;
 justify-content:center;
+align-items:center;
 text-align:center;
-color:white;
 padding-top:80px;
 }
 
 .hero h1{
-font-size:48px;
-letter-spacing:2px;
+font-size:55px;
+letter-spacing:3px;
+color:gold;
 }
 
 .hero p{
 margin:10px 0;
-font-size:20px;
+font-size:22px;
 }
 
 .btn{
 background:gold;
 color:black;
-padding:12px 25px;
-border-radius:5px;
+padding:14px 30px;
+border-radius:6px;
 font-weight:600;
 margin-top:15px;
 display:inline-block;
 }
 
-/* SECTIONS */
+/* SECTION */
 section{
-padding:70px 10%;
+padding:80px 10%;
 }
 
 .section-title{
 text-align:center;
-font-size:32px;
-margin-bottom:40px;
+font-size:34px;
+margin-bottom:50px;
+color:gold;
 }
 
-/* PROPERTY GRID */
+/* GRID */
 .grid{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:25px;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:30px;
 }
 
 .card{
-background:white;
-border-radius:12px;
+background:#111827;
+border-radius:15px;
 overflow:hidden;
-box-shadow:0 5px 15px rgba(0,0,0,.1);
-transition:.3s;
+box-shadow:0 8px 20px rgba(0,0,0,.4);
+transition:.4s;
 }
 
 .card:hover{
-transform:translateY(-5px);
+transform:translateY(-8px);
 }
 
 .card img{
 width:100%;
-height:200px;
+height:220px;
 object-fit:cover;
 }
 
 .card-content{
-padding:15px;
+padding:20px;
 }
 
 /* FOUNDER */
 .founder{
-background:#0f172a;
-color:white;
+background:#111827;
 text-align:center;
 }
 
 .founder img{
-width:140px;
-height:140px;
+width:150px;
+height:150px;
 border-radius:50%;
 border:4px solid gold;
 margin:20px;
 object-fit:cover;
 }
 
+/* TESTIMONIAL */
+.testimonial{
+background:#0f172a;
+text-align:center;
+}
+
+.review{
+background:#111827;
+padding:20px;
+border-radius:12px;
+}
+
 /* CONTACT */
 .contact{
 text-align:center;
-background:#f9f9f9;
+background:#111827;
+}
+
+input, textarea{
+width:100%;
+padding:12px;
+margin:10px 0;
+border-radius:5px;
+border:none;
 }
 
 /* FOOTER */
 footer{
 background:#000;
-color:white;
 text-align:center;
 padding:20px;
+color:#aaa;
 }
 
-/* FLOATING BUTTONS */
+/* FLOAT BUTTONS */
 .whatsapp,.call{
 position:fixed;
 bottom:20px;
@@ -172,15 +198,8 @@ color:white;
 z-index:999;
 }
 
-.whatsapp{
-right:20px;
-background:#25D366;
-}
-
-.call{
-left:20px;
-background:#007BFF;
-}
+.whatsapp{right:20px;background:#25D366;}
+.call{left:20px;background:#007BFF;}
 
 </style>
 </head>
@@ -188,25 +207,26 @@ background:#007BFF;
 <body>
 
 <div class="topbar">
-DIVYARAA HOMES – Trusted Real Estate Services
+DIVYARAA HOMES – Trusted Luxury Real Estate
 </div>
 
 <nav>
 <a href="#home">Home</a>
 <a href="#properties">Properties</a>
 <a href="#about">About</a>
+<a href="#reviews">Reviews</a>
 <a href="#contact">Contact</a>
 </nav>
 
 <div class="hero" id="home">
 <h1>DIVYARAA HOMES</h1>
 <p>Kanpur | Lucknow | Fatehpur | Banda | Hamirpur</p>
-<p>Premium Property Solutions</p>
-<a href="#contact" class="btn">Enquire Now</a>
+<p>Luxury Property Advisory & Investment Solutions</p>
+<a href="#contact" class="btn">Book Consultation</a>
 </div>
 
 <section id="properties">
-<h2 class="section-title">Featured Properties</h2>
+<h2 class="section-title">Premium Properties</h2>
 
 <div class="grid">
 
@@ -215,16 +235,16 @@ DIVYARAA HOMES – Trusted Real Estate Services
 <div class="card-content">
 <h3>Residential Plot – Kanpur</h3>
 <p>₹12 Lakh</p>
-<a href="https://wa.me/917706917829" class="btn">Contact</a>
+<a href="https://wa.me/917706917829" class="btn">Enquire</a>
 </div>
 </div>
 
 <div class="card">
 <img src="https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6">
 <div class="card-content">
-<h3>2 BHK House – Lucknow</h3>
-<p>₹35 Lakh</p>
-<a href="https://wa.me/917706917829" class="btn">Contact</a>
+<h3>Luxury House – Lucknow</h3>
+<p>₹45 Lakh</p>
+<a href="https://wa.me/917706917829" class="btn">Enquire</a>
 </div>
 </div>
 
@@ -233,7 +253,7 @@ DIVYARAA HOMES – Trusted Real Estate Services
 <div class="card-content">
 <h3>Commercial Shop – Banda</h3>
 <p>₹22 Lakh</p>
-<a href="https://wa.me/917706917829" class="btn">Contact</a>
+<a href="https://wa.me/917706917829" class="btn">Enquire</a>
 </div>
 </div>
 
@@ -242,16 +262,21 @@ DIVYARAA HOMES – Trusted Real Estate Services
 
 <section class="founder" id="about">
 <h2 class="section-title">Founder & Vision</h2>
-
-<img src="founder.jpg" alt="Founder">
-
+<img src="founder.jpg">
 <h3>Brijendra Chakraborty</h3>
-
 <p style="max-width:700px;margin:auto;">
-We are committed to transparent and trusted real estate services.
-Helping families find secure and valuable homes across Uttar Pradesh.
+Delivering transparent and premium real estate solutions.
+Our mission is to help families build wealth through trusted property investments.
 </p>
+</section>
 
+<section class="testimonial" id="reviews">
+<h2 class="section-title">Client Testimonials</h2>
+<div class="grid">
+<div class="review">"Highly professional and trustworthy service." – Rahul Verma</div>
+<div class="review">"Best property advisor in UP." – Sandeep Mishra</div>
+<div class="review">"Smooth deal & full support till registry." – Amit Singh</div>
+</div>
 </section>
 
 <section class="contact" id="contact">
@@ -259,8 +284,13 @@ Helping families find secure and valuable homes across Uttar Pradesh.
 <p>📞 7706917829 / 7755864651</p>
 <p>📧 divyaraahomes@gmail.com</p>
 
-<a href="https://wa.me/917706917829" class="btn">WhatsApp Now</a>
-<a href="tel:7706917829" class="btn">Call Now</a>
+<form action="mailto:divyaraahomes@gmail.com" method="post" enctype="text/plain">
+<input type="text" name="Name" placeholder="Your Name" required>
+<input type="text" name="Mobile" placeholder="Mobile Number" required>
+<textarea name="Message" rows="4" placeholder="Your Requirement"></textarea>
+<button type="submit" class="btn">Send Enquiry</button>
+</form>
+
 </section>
 
 <footer>
