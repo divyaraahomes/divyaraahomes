@@ -1,285 +1,99 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-
-<meta charset="UTF-8">
-<title>Admin Panel | Divyaraa Homes</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyDdpuNucflUlnN5FZy9EV8wxgZy041mxWc",
-  authDomain: "divyaraa-homes.firebaseapp.com",
-  projectId: "divyaraa-homes"
-};
-
-firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
-const db = firebase.firestore();
-</script>
-
-<style>
-
-body{
-margin:0;
-font-family:Poppins,sans-serif;
-background:#050816;
-color:white;
-}
-
-/* HEADER */
-
-header{
-background:black;
-color:gold;
-padding:15px;
-text-align:center;
-font-size:20px;
-position:sticky;
-top:0;
-z-index:99;
-}
-
-.logout{
-float:right;
-background:red;
-color:white;
-padding:6px 12px;
-border-radius:4px;
-cursor:pointer;
-}
-
-/* CONTAINER */
-
-.container{
-padding:25px;
-max-width:1000px;
-margin:auto;
-}
-
-/* DASHBOARD */
-
-.dashboard{
-display:flex;
-justify-content:space-between;
-flex-wrap:wrap;
-margin-bottom:20px;
-}
-
-.box{
-background:#111;
-padding:15px;
-border-radius:8px;
-border:1px solid #222;
-min-width:220px;
-margin:5px;
-text-align:center;
-}
-
-/* FORM */
-
-input,textarea{
-width:100%;
-padding:12px;
-margin:8px 0;
-border-radius:5px;
-border:none;
-font-size:14px;
-}
-
-button{
-background:gold;
-border:none;
-padding:10px 20px;
-font-weight:600;
-cursor:pointer;
-border-radius:5px;
-}
-
-button:hover{
-background:#ffcc00;
-}
-
-#msg{
-color:lightgreen;
-font-weight:600;
-}
-
-/* SEARCH */
-
-.search{
-margin:15px 0;
-}
-
-.search input{
-width:100%;
-padding:10px;
-border-radius:5px;
-border:none;
-}
-
-/* PROPERTY LIST */
-
-.property-box{
-background:#111;
-padding:15px;
-margin-top:15px;
-border-radius:8px;
-border:1px solid #222;
-}
-
-.property-box img{
-width:100%;
-max-height:200px;
-object-fit:cover;
-border-radius:5px;
-margin:8px 0;
-}
-
-.action-btns{
-margin-top:10px;
-}
-
-.del-btn{
-background:red;
-color:white;
-border:none;
-padding:6px 12px;
-cursor:pointer;
-border-radius:4px;
-}
-
-.edit-btn{
-background:#007bff;
-color:white;
-border:none;
-padding:6px 12px;
-cursor:pointer;
-border-radius:4px;
-margin-right:5px;
-}
-
-.del-btn:hover,
-.edit-btn:hover{
-opacity:0.8;
-}
-
-</style>
-
-</head>
-
-<body>
-
-<header>
-Admin Panel - Divyaraa Homes
-<span class="logout" onclick="logout()">Logout</span>
-</header>
-
-<div class="container">
-
-<!-- DASHBOARD -->
-
-<div class="dashboard">
-
-<div class="box">
-<h3 id="adminName">Admin</h3>
-<p>Logged In</p>
-</div>
-
-<div class="box">
-<h3 id="totalProp">0</h3>
-<p>Total Properties</p>
-</div>
-
-</div>
-
-
-<!-- ADD PROPERTY -->
-
-<h2>Add / Update Property</h2>
-
-<input id="pid" type="hidden">
-
-<input id="title" placeholder="Title (Hindi/English)">
-<input id="price" placeholder="Price">
-<input id="location" placeholder="Location">
-<input id="image" placeholder="Image URL">
-<textarea id="desc" placeholder="Description"></textarea>
-
-<button onclick="saveProperty()">Save Property</button>
-
-<p id="msg"></p>
-
-
-<!-- SEARCH -->
-
-<div class="search">
-<input id="searchBox" placeholder="Search Property..." onkeyup="searchProperty()">
-</div>
-
-
-<!-- PROPERTY LIST -->
-
-<h2>All Properties</h2>
-
-<div id="propertyList"></div>
-
-</div>
-
-
 <script>
 
-/* AUTH CHECK */
+/* ================= INIT ================= */
+
+const storage = firebase.storage();
+let allData = [];
+
+/* ================= AUTH CHECK ================= */
 
 auth.onAuthStateChanged(user=>{
 
 if(!user){
 window.location="login.html";
+return;
+}
+
+adminName.innerText = user.email;
+
+/* Admin Role Check */
+
+db.collection("admins")
+.doc(user.uid)
+.get()
+.then(doc=>{
+
+if(!doc.exists){
+alert("Not Authorized ❌");
+auth.signOut();
+window.location="login.html";
 }else{
-document.getElementById("adminName").innerText = user.email;
 loadProperties();
+loadLeads();
 }
 
 });
 
+});
 
-/* SAVE PROPERTY */
 
-function saveProperty(){
+/* ================= SAVE PROPERTY (WITH IMAGE UPLOAD) ================= */
+
+async function saveProperty(){
 
 if(
 !title.value ||
 !price.value ||
 !location.value ||
-!image.value ||
 !desc.value
 ){
 alert("Fill All Fields");
 return;
 }
 
+let file = document.getElementById("imageFile")?.files[0];
+let imageURL = image?.value || "";
+
+if(file){
+
+msg.innerText="Uploading Image...";
+
+let ref = storage.ref("properties/"+Date.now()+"_"+file.name);
+await ref.put(file);
+imageURL = await ref.getDownloadURL();
+
+}
+
+if(!imageURL){
+alert("Add Image or Upload One");
+return;
+}
+
 let data = {
 
 title_hi: title.value,
+title_en: title.value,
+
 price_hi: price.value,
+price_en: price.value,
+
 location_hi: location.value,
-image: image.value,
+location_en: location.value,
+
+image: imageURL,
+
 description_hi: desc.value,
+description_en: desc.value,
+
+status: "Available",
+
 createdAt: new Date()
 
 };
 
 if(pid.value){
 
-db.collection("properties")
+await db.collection("properties")
 .doc(pid.value)
 .update(data);
 
@@ -287,7 +101,7 @@ msg.innerText="Updated Successfully ✅";
 
 }else{
 
-db.collection("properties")
+await db.collection("properties")
 .add(data);
 
 msg.innerText="Added Successfully ✅";
@@ -299,7 +113,7 @@ clearForm();
 }
 
 
-/* CLEAR FORM */
+/* ================= CLEAR FORM ================= */
 
 function clearForm(){
 
@@ -307,15 +121,13 @@ pid.value="";
 title.value="";
 price.value="";
 location.value="";
-image.value="";
 desc.value="";
+if(imageFile) imageFile.value="";
 
 }
 
 
-/* LOAD PROPERTIES */
-
-let allData=[];
+/* ================= LOAD PROPERTIES ================= */
 
 function loadProperties(){
 
@@ -339,15 +151,15 @@ html+=makeCard(d);
 
 });
 
-document.getElementById("propertyList").innerHTML=html;
-document.getElementById("totalProp").innerText=count;
+propertyList.innerHTML=html;
+totalProp.innerText=count;
 
 });
 
 }
 
 
-/* MAKE CARD */
+/* ================= PROPERTY CARD ================= */
 
 function makeCard(d){
 
@@ -357,10 +169,11 @@ return `
 
 <h3>${d.title_hi}</h3>
 
+<p><b>Status:</b> ${d.status}</p>
 <p><b>Price:</b> ${d.price_hi}</p>
 <p><b>Location:</b> ${d.location_hi}</p>
 
-<img src="${d.image}">
+<img src="${d.image}" loading="lazy">
 
 <p>${d.description_hi}</p>
 
@@ -368,6 +181,10 @@ return `
 
 <button class="edit-btn" onclick="editProperty('${d.id}')">
 Edit
+</button>
+
+<button class="edit-btn" onclick="changeStatus('${d.id}','Sold')">
+Mark Sold
 </button>
 
 <button class="del-btn" onclick="deleteProperty('${d.id}')">
@@ -383,7 +200,7 @@ Delete
 }
 
 
-/* EDIT */
+/* ================= EDIT ================= */
 
 function editProperty(id){
 
@@ -399,7 +216,6 @@ pid.value=id;
 title.value=d.title_hi;
 price.value=d.price_hi;
 location.value=d.location_hi;
-image.value=d.image;
 desc.value=d.description_hi;
 
 window.scrollTo(0,0);
@@ -409,11 +225,22 @@ window.scrollTo(0,0);
 }
 
 
-/* DELETE */
+/* ================= STATUS ================= */
+
+function changeStatus(id,status){
+
+db.collection("properties")
+.doc(id)
+.update({status:status});
+
+}
+
+
+/* ================= DELETE ================= */
 
 function deleteProperty(id){
 
-if(confirm("Delete this property?")){
+if(confirm("Delete permanently?")){
 
 db.collection("properties")
 .doc(id)
@@ -424,7 +251,7 @@ db.collection("properties")
 }
 
 
-/* SEARCH */
+/* ================= SEARCH ================= */
 
 function searchProperty(){
 
@@ -434,19 +261,57 @@ let html="";
 allData.forEach(d=>{
 
 if(d.title_hi.toLowerCase().includes(q)){
-
 html+=makeCard(d);
-
 }
 
 });
 
-document.getElementById("propertyList").innerHTML=html;
+propertyList.innerHTML=html;
 
 }
 
 
-/* LOGOUT */
+/* ================= LOAD LEADS ================= */
+
+function loadLeads(){
+
+db.collection("leads")
+.orderBy("time","desc")
+.onSnapshot(snapshot=>{
+
+let html="";
+
+snapshot.forEach(doc=>{
+
+let d=doc.data();
+
+html+=`
+
+<div class="property-box">
+
+<p><b>Name:</b> ${d.name}</p>
+<p><b>Mobile:</b> ${d.mobile}</p>
+<p><b>Message:</b> ${d.message}</p>
+
+<a href="https://wa.me/91${d.mobile}" 
+class="edit-btn" target="_blank">Reply</a>
+
+</div>
+
+`;
+
+});
+
+if(document.getElementById("leadList")){
+document.getElementById("leadList").innerHTML=html;
+}
+
+});
+
+}
+
+
+/* ================= LOGOUT ================= */
 
 function logout(){
 
@@ -457,6 +322,3 @@ window.location="login.html";
 }
 
 </script>
-
-</body>
-</html>
