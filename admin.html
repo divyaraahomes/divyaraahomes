@@ -8,6 +8,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -26,6 +27,7 @@ const db = firebase.firestore();
 </script>
 
 <style>
+
 body{
 margin:0;
 font-family:Poppins,sans-serif;
@@ -33,12 +35,17 @@ background:#050816;
 color:white;
 }
 
+/* HEADER */
+
 header{
 background:black;
 color:gold;
 padding:15px;
 text-align:center;
 font-size:20px;
+position:sticky;
+top:0;
+z-index:99;
 }
 
 .logout{
@@ -50,11 +57,34 @@ border-radius:4px;
 cursor:pointer;
 }
 
+/* CONTAINER */
+
 .container{
 padding:25px;
-max-width:900px;
+max-width:1000px;
 margin:auto;
 }
+
+/* DASHBOARD */
+
+.dashboard{
+display:flex;
+justify-content:space-between;
+flex-wrap:wrap;
+margin-bottom:20px;
+}
+
+.box{
+background:#111;
+padding:15px;
+border-radius:8px;
+border:1px solid #222;
+min-width:220px;
+margin:5px;
+text-align:center;
+}
+
+/* FORM */
 
 input,textarea{
 width:100%;
@@ -62,6 +92,7 @@ padding:12px;
 margin:8px 0;
 border-radius:5px;
 border:none;
+font-size:14px;
 }
 
 button{
@@ -70,7 +101,77 @@ border:none;
 padding:10px 20px;
 font-weight:600;
 cursor:pointer;
+border-radius:5px;
 }
+
+button:hover{
+background:#ffcc00;
+}
+
+#msg{
+color:lightgreen;
+font-weight:600;
+}
+
+/* SEARCH */
+
+.search{
+margin:15px 0;
+}
+
+.search input{
+width:100%;
+padding:10px;
+border-radius:5px;
+border:none;
+}
+
+/* PROPERTY LIST */
+
+.property-box{
+background:#111;
+padding:15px;
+margin-top:15px;
+border-radius:8px;
+border:1px solid #222;
+}
+
+.property-box img{
+width:100%;
+max-height:200px;
+object-fit:cover;
+border-radius:5px;
+margin:8px 0;
+}
+
+.action-btns{
+margin-top:10px;
+}
+
+.del-btn{
+background:red;
+color:white;
+border:none;
+padding:6px 12px;
+cursor:pointer;
+border-radius:4px;
+}
+
+.edit-btn{
+background:#007bff;
+color:white;
+border:none;
+padding:6px 12px;
+cursor:pointer;
+border-radius:4px;
+margin-right:5px;
+}
+
+.del-btn:hover,
+.edit-btn:hover{
+opacity:0.8;
+}
+
 </style>
 
 </head>
@@ -84,33 +185,88 @@ Admin Panel - Divyaraa Homes
 
 <div class="container">
 
-<h2>Add Property</h2>
+<!-- DASHBOARD -->
 
-<input id="title" placeholder="Title">
+<div class="dashboard">
+
+<div class="box">
+<h3 id="adminName">Admin</h3>
+<p>Logged In</p>
+</div>
+
+<div class="box">
+<h3 id="totalProp">0</h3>
+<p>Total Properties</p>
+</div>
+
+</div>
+
+
+<!-- ADD PROPERTY -->
+
+<h2>Add / Update Property</h2>
+
+<input id="pid" type="hidden">
+
+<input id="title" placeholder="Title (Hindi/English)">
 <input id="price" placeholder="Price">
 <input id="location" placeholder="Location">
 <input id="image" placeholder="Image URL">
 <textarea id="desc" placeholder="Description"></textarea>
 
-<button onclick="addProperty()">Add</button>
+<button onclick="saveProperty()">Save Property</button>
 
 <p id="msg"></p>
 
+
+<!-- SEARCH -->
+
+<div class="search">
+<input id="searchBox" placeholder="Search Property..." onkeyup="searchProperty()">
 </div>
+
+
+<!-- PROPERTY LIST -->
+
+<h2>All Properties</h2>
+
+<div id="propertyList"></div>
+
+</div>
+
 
 <script>
 
-/* Protect Page */
+/* AUTH CHECK */
+
 auth.onAuthStateChanged(user=>{
-  if(!user){
-    window.location.href="login.html";
-  }
+
+if(!user){
+window.location="login.html";
+}else{
+document.getElementById("adminName").innerText = user.email;
+loadProperties();
+}
+
 });
 
-/* Add Property */
-function addProperty(){
 
-db.collection("properties").add({
+/* SAVE PROPERTY */
+
+function saveProperty(){
+
+if(
+!title.value ||
+!price.value ||
+!location.value ||
+!image.value ||
+!desc.value
+){
+alert("Fill All Fields");
+return;
+}
+
+let data = {
 
 title_hi: title.value,
 price_hi: price.value,
@@ -119,17 +275,185 @@ image: image.value,
 description_hi: desc.value,
 createdAt: new Date()
 
-});
+};
+
+if(pid.value){
+
+db.collection("properties")
+.doc(pid.value)
+.update(data);
+
+msg.innerText="Updated Successfully ✅";
+
+}else{
+
+db.collection("properties")
+.add(data);
 
 msg.innerText="Added Successfully ✅";
 
 }
 
-/* Logout */
+clearForm();
+
+}
+
+
+/* CLEAR FORM */
+
+function clearForm(){
+
+pid.value="";
+title.value="";
+price.value="";
+location.value="";
+image.value="";
+desc.value="";
+
+}
+
+
+/* LOAD PROPERTIES */
+
+let allData=[];
+
+function loadProperties(){
+
+db.collection("properties")
+.orderBy("createdAt","desc")
+.onSnapshot(snapshot=>{
+
+let html="";
+allData=[];
+let count=0;
+
+snapshot.forEach(doc=>{
+
+let d=doc.data();
+d.id=doc.id;
+
+allData.push(d);
+count++;
+
+html+=makeCard(d);
+
+});
+
+document.getElementById("propertyList").innerHTML=html;
+document.getElementById("totalProp").innerText=count;
+
+});
+
+}
+
+
+/* MAKE CARD */
+
+function makeCard(d){
+
+return `
+
+<div class="property-box">
+
+<h3>${d.title_hi}</h3>
+
+<p><b>Price:</b> ${d.price_hi}</p>
+<p><b>Location:</b> ${d.location_hi}</p>
+
+<img src="${d.image}">
+
+<p>${d.description_hi}</p>
+
+<div class="action-btns">
+
+<button class="edit-btn" onclick="editProperty('${d.id}')">
+Edit
+</button>
+
+<button class="del-btn" onclick="deleteProperty('${d.id}')">
+Delete
+</button>
+
+</div>
+
+</div>
+
+`;
+
+}
+
+
+/* EDIT */
+
+function editProperty(id){
+
+db.collection("properties")
+.doc(id)
+.get()
+.then(doc=>{
+
+let d=doc.data();
+
+pid.value=id;
+
+title.value=d.title_hi;
+price.value=d.price_hi;
+location.value=d.location_hi;
+image.value=d.image;
+desc.value=d.description_hi;
+
+window.scrollTo(0,0);
+
+});
+
+}
+
+
+/* DELETE */
+
+function deleteProperty(id){
+
+if(confirm("Delete this property?")){
+
+db.collection("properties")
+.doc(id)
+.delete();
+
+}
+
+}
+
+
+/* SEARCH */
+
+function searchProperty(){
+
+let q = searchBox.value.toLowerCase();
+let html="";
+
+allData.forEach(d=>{
+
+if(d.title_hi.toLowerCase().includes(q)){
+
+html+=makeCard(d);
+
+}
+
+});
+
+document.getElementById("propertyList").innerHTML=html;
+
+}
+
+
+/* LOGOUT */
+
 function logout(){
+
 auth.signOut().then(()=>{
 window.location="login.html";
 });
+
 }
 
 </script>
