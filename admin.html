@@ -1,94 +1,122 @@
 <!DOCTYPE html>
 <html>
 <head>
+
 <title>Admin Panel | Divyaraa Homes</title>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-
-<style>
-body{
-font-family:Arial;
-background:#050816;
-color:white;
-padding:20px;
-}
-
-h2{
-color:gold;
-text-align:center;
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-margin-top:20px;
-}
-
-th,td{
-border:1px solid #333;
-padding:10px;
-text-align:center;
-}
-
-th{
-background:#111;
-color:gold;
-}
-</style>
-</head>
-
-<body>
-
-<h2>Divyaraa Homes - Admin Panel</h2>
-
-<table>
-<tr>
-<th>Name</th>
-<th>Mobile</th>
-<th>Message</th>
-<th>Date</th>
-</tr>
-
-<tbody id="data"></tbody>
-</table>
 
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyDdpuNucflUlnN5FZy9EV8wxgZy041mxWc",
   authDomain: "divyaraa-homes.firebaseapp.com",
   projectId: "divyaraa-homes",
-  storageBucket: "divyaraa-homes.firebasestorage.app",
-  messagingSenderId: "135741152456",
-  appId: "1:135741152456:web:7fb6ad26eb72e8ccf959fd"
 };
 
 firebase.initializeApp(firebaseConfig);
 
-const db=firebase.firestore();
+const auth = firebase.auth();
+const db = firebase.firestore();
+</script>
 
-db.collection("leads").orderBy("time","desc").onSnapshot((snap)=>{
+<style>
 
-let html="";
+body{
+font-family:Poppins;
+background:#050816;
+color:white;
+text-align:center;
+}
 
-snap.forEach(doc=>{
+input,button{
+padding:10px;
+margin:8px;
+width:250px;
+border-radius:6px;
+border:none;
+}
 
-let d=doc.data();
+button{
+background:gold;
+font-weight:bold;
+}
 
-html+=`
-<tr>
-<td>${d.name}</td>
-<td>${d.mobile}</td>
-<td>${d.message}</td>
-<td>${new Date(d.time.seconds*1000).toLocaleString()}</td>
-</tr>
-`;
+</style>
+</head>
+
+<body>
+
+<h2>Admin Login</h2>
+
+<div id="login">
+
+<input type="email" id="email" placeholder="Email">
+<input type="password" id="pass" placeholder="Password">
+
+<button onclick="login()">Login</button>
+
+</div>
+
+<div id="panel" style="display:none">
+
+<h2>Add Property</h2>
+
+<input id="title" placeholder="Title Hindi">
+<input id="location" placeholder="Location">
+<input id="price" placeholder="Price">
+<input id="image" placeholder="Image URL">
+
+<button onclick="add()">Add Property</button>
+
+</div>
+
+
+<script>
+
+function login(){
+
+auth.signInWithEmailAndPassword(
+email.value,
+pass.value
+)
+
+.then(user=>{
+
+if(user.user.email==="brijendra019@gmail.com"){
+
+login.style.display="none";
+panel.style.display="block";
+
+}else{
+
+alert("Not Authorized");
+auth.signOut();
+
+}
 
 });
 
-document.getElementById("data").innerHTML=html;
+}
+
+
+function add(){
+
+db.collection("properties").add({
+
+title_hi: title.value,
+location_hi: location.value,
+price_hi: price.value,
+image: image.value,
+createdAt: new Date()
 
 });
+
+alert("Property Added");
+
+}
+
 </script>
 
 </body>
