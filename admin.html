@@ -1,294 +1,259 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-
-<meta charset="UTF-8">
-<title>Admin Panel | Divyaraa Homes</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
-<!-- FIREBASE SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
-
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyDdpuNucflUlnN5FZy9EV8wxgZy041mxWc",
-  authDomain: "divyaraa-homes.firebaseapp.com",
-  projectId: "divyaraa-homes",
-  storageBucket: "divyaraa-homes.appspot.com"
-};
 
-firebase.initializeApp(firebaseConfig);
+/* ================= CONFIG ================= */
 
+const storage = firebase.storage();
 const auth = firebase.auth();
 const db = firebase.firestore();
-const storage = firebase.storage();
-</script>
 
-<style>
+let allData = [];
+let currentAdmin = "";
+let loginTime = Date.now();
 
-body{
-margin:0;
-font-family:Poppins,sans-serif;
-background:#050816;
-color:white;
+
+/* ================= SAFE HELPER ================= */
+
+function el(id){
+  return document.getElementById(id);
 }
 
-header{
-background:black;
-color:gold;
-padding:15px;
-text-align:center;
-font-size:20px;
+
+/* ================= AUTO LOGOUT (30 min) ================= */
+
+setInterval(()=>{
+  if(Date.now() - loginTime > 30*60*1000){
+    alert("Session Expired. Login Again.");
+    logout();
+  }
+},60000);
+
+
+/* ================= ACTIVITY LOG ================= */
+
+function logActivity(action){
+
+  db.collection("admin_logs").add({
+    admin: currentAdmin,
+    action: action,
+    ip: "client",
+    time: new Date()
+  });
+
 }
 
-.logout{
-float:right;
-background:red;
-color:white;
-padding:6px 12px;
-border-radius:4px;
-cursor:pointer;
-}
 
-.container{
-max-width:1000px;
-margin:auto;
-padding:25px;
-}
+/* ================= AUTH CHECK ================= */
 
-input,textarea{
-width:100%;
-padding:10px;
-margin:6px 0;
-border-radius:5px;
-border:none;
-}
+auth.onAuthStateChanged(async user=>{
 
-button{
-background:gold;
-border:none;
-padding:10px 20px;
-font-weight:600;
-cursor:pointer;
-border-radius:5px;
-}
+  if(!user){
+    window.location="login.html";
+    return;
+  }
 
-.property-box{
-background:#111;
-padding:15px;
-margin-top:15px;
-border-radius:8px;
-border:1px solid #222;
-}
+  currentAdmin = user.email;
+  loginTime = Date.now();
 
-.property-box img{
-width:100%;
-max-height:200px;
-object-fit:cover;
-}
+  if(el("adminName")){
+    el("adminName").innerText = user.email;
+  }
 
-</style>
+  try{
 
-</head>
+    let snap = await db.collection("admins")
+                      .doc(user.uid)
+                      .get();
 
-<body>
+    if(!snap.exists){
 
-<header>
-Admin Panel - Divyaraa Homes
-<span class="logout" onclick="logout()">Logout</span>
-</header>
+      alert("Unauthorized Access ❌");
+      await auth.signOut();
+      window.location="login.html";
+      return;
 
-<div class="container">
+    }
 
-<h3 id="adminName"></h3>
+    logActivity("Login Success");
 
-<h2>Add Property</h2>
+    loadProperties();
+    loadLeads();
+    loadStats();
 
-<input type="hidden" id="pid">
+  }catch(err){
 
-<input id="title" placeholder="Title">
-<input id="price" placeholder="Price">
-<input id="location" placeholder="Location">
+    alert("Security Error: "+err.message);
 
-<input type="file" id="imageFile">
-
-<textarea id="desc" placeholder="Description"></textarea>
-
-<button onclick="saveProperty()">Save</button>
-
-<p id="msg"></p>
-
-<hr>
-
-<input id="searchBox" placeholder="Search..." onkeyup="searchProperty()">
-
-<h2>All Properties (<span id="totalProp">0</span>)</h2>
-
-<div id="propertyList"></div>
-
-<h2>Leads</h2>
-
-<div id="leadList"></div>
-
-<br>
-
-<button onclick="backupData()">Backup</button>
-
-</div>
-
-
-<script>
-
-let allData=[];
-
-
-/* AUTH */
-
-auth.onAuthStateChanged(user=>{
-
-if(!user){
-location="login.html";
-return;
-}
-
-adminName.innerText = "Logged in: " + user.email;
-
-loadProperties();
-loadLeads();
+  }
 
 });
 
 
-/* SAVE */
+/* ================= SAVE PROPERTY ================= */
 
 async function saveProperty(){
 
 try{
 
-if(!title.value||!price.value||!location.value||!desc.value){
-alert("Fill all fields");
-return;
-}
+  if(
+    !el("title").value ||
+    !el("price").value ||
+    !el("location").value ||
+    !el("desc").value
+  ){
+    alert("Fill All Fields");
+    return;
+  }
 
-let file=imageFile.files[0];
+  let file = el("imageFile")?.files[0];
 
-if(!file){
-alert("Upload image");
-return;
-}
+  if(!file){
+    alert("Upload Image First");
+    return;
+  }
 
-msg.innerText="Uploading...";
 
-let ref=storage.ref("properties/"+Date.now()+"_"+file.name);
+  el("msg").innerText="Uploading...";
 
-await ref.put(file);
+  /* Upload */
 
-let url=await ref.getDownloadURL();
+  let ref = storage.ref("properties/"+Date.now()+"_"+file.name);
 
-let data={
+  await ref.put(file);
 
-title_hi:title.value,
-price_hi:price.value,
-location_hi:location.value,
-image:url,
-description_hi:desc.value,
-status:"Available",
-createdAt:new Date()
+  let imageURL = await ref.getDownloadURL();
 
-};
 
-if(pid.value){
+  /* Data */
 
-await db.collection("properties").doc(pid.value).update(data);
-msg.innerText="Updated ✅";
+  let data = {
 
-}else{
+    title_hi: el("title").value,
+    title_en: el("title").value,
 
-await db.collection("properties").add(data);
-msg.innerText="Added ✅";
+    price_hi: el("price").value,
+    price_en: el("price").value,
 
-}
+    location_hi: el("location").value,
+    location_en: el("location").value,
 
-clearForm();
+    image: imageURL,
+
+    description_hi: el("desc").value,
+    description_en: el("desc").value,
+
+    status: "Available",
+
+    updatedBy: currentAdmin,
+
+    createdAt: new Date()
+
+  };
+
+
+  if(el("pid").value){
+
+    await db.collection("properties")
+            .doc(el("pid").value)
+            .update(data);
+
+    el("msg").innerText="Updated ✅";
+
+    logActivity("Update Property");
+
+  }else{
+
+    await db.collection("properties")
+            .add(data);
+
+    el("msg").innerText="Added ✅";
+
+    logActivity("Add Property");
+
+  }
+
+
+  clearForm();
 
 }catch(e){
-alert(e.message);
-}
+
+  alert("Save Failed: "+e.message);
 
 }
 
+}
 
-/* CLEAR */
+
+/* ================= CLEAR ================= */
 
 function clearForm(){
 
-pid.value="";
-title.value="";
-price.value="";
-location.value="";
-desc.value="";
-imageFile.value="";
+  ["pid","title","price","location","desc","imageFile"]
+  .forEach(id=>{
+    if(el(id)) el(id).value="";
+  });
 
 }
 
 
-/* LOAD */
+/* ================= LOAD PROPERTIES ================= */
 
 function loadProperties(){
 
 db.collection("properties")
 .orderBy("createdAt","desc")
-.onSnapshot(snap=>{
+.onSnapshot(snapshot=>{
 
-let html="";
-allData=[];
-let c=0;
+  let html="";
+  allData=[];
+  let count=0;
 
-snap.forEach(d=>{
+  snapshot.forEach(doc=>{
 
-let x=d.data();
-x.id=d.id;
+    let d=doc.data();
+    d.id=doc.id;
 
-allData.push(x);
-c++;
+    allData.push(d);
+    count++;
 
-html+=card(x);
+    html+=makeCard(d);
 
-});
+  });
 
-propertyList.innerHTML=html;
-totalProp.innerText=c;
+  if(el("propertyList")) el("propertyList").innerHTML=html;
+  if(el("totalProp")) el("totalProp").innerText=count;
 
 });
 
 }
 
 
-/* CARD */
+/* ================= CARD ================= */
 
-function card(d){
+function makeCard(d){
 
-return`
+return `
 
 <div class="property-box">
 
 <h3>${d.title_hi}</h3>
 
-<p>${d.price_hi}</p>
-<p>${d.location_hi}</p>
+<p>Status: ${d.status}</p>
+<p>Price: ${d.price_hi}</p>
+<p>Location: ${d.location_hi}</p>
 
-<img src="${d.image}">
+<img src="${d.image}" loading="lazy">
 
 <p>${d.description_hi}</p>
 
-<button onclick="edit('${d.id}')">Edit</button>
+<div class="action-btns">
 
-<button onclick="del('${d.id}')">Delete</button>
+<button onclick="editProperty('${d.id}')">Edit</button>
+
+<button onclick="changeStatus('${d.id}','Sold')">Sold</button>
+
+<button onclick="deleteProperty('${d.id}')">Delete</button>
+
+</div>
 
 </div>
 
@@ -297,132 +262,185 @@ return`
 }
 
 
-/* EDIT */
+/* ================= EDIT ================= */
 
-function edit(id){
+function editProperty(id){
 
-db.collection("properties").doc(id).get().then(d=>{
+db.collection("properties")
+.doc(id)
+.get()
+.then(doc=>{
 
-let x=d.data();
+  let d=doc.data();
 
-pid.value=id;
-title.value=x.title_hi;
-price.value=x.price_hi;
-location.value=x.location_hi;
-desc.value=x.description_hi;
+  el("pid").value=id;
+  el("title").value=d.title_hi;
+  el("price").value=d.price_hi;
+  el("location").value=d.location_hi;
+  el("desc").value=d.description_hi;
 
-scrollTo(0,0);
+  window.scrollTo(0,0);
 
 });
 
 }
 
 
-/* DELETE */
+/* ================= STATUS ================= */
 
-function del(id){
+function changeStatus(id,status){
 
-if(confirm("Delete?")){
+db.collection("properties")
+.doc(id)
+.update({status});
 
-db.collection("properties").doc(id).delete();
+logActivity("Status Changed");
+
+loadStats();
+
+}
+
+
+/* ================= DELETE ================= */
+
+function deleteProperty(id){
+
+if(confirm("Delete Permanently?")){
+
+  db.collection("properties")
+    .doc(id)
+    .delete();
+
+  logActivity("Deleted Property");
 
 }
 
 }
 
 
-/* SEARCH */
+/* ================= SEARCH ================= */
 
 function searchProperty(){
 
-let q=searchBox.value.toLowerCase();
+let q = el("searchBox").value.toLowerCase();
 let html="";
 
 allData.forEach(d=>{
 
-if(d.title_hi.toLowerCase().includes(q)){
-html+=card(d);
-}
+  if(d.title_hi.toLowerCase().includes(q)){
+    html+=makeCard(d);
+  }
 
 });
 
-propertyList.innerHTML=html;
+el("propertyList").innerHTML=html;
 
 }
 
 
-/* LEADS */
+/* ================= LEADS ================= */
 
 function loadLeads(){
 
 db.collection("leads")
 .orderBy("time","desc")
-.onSnapshot(snap=>{
+.onSnapshot(snapshot=>{
 
-let html="";
+  let html="";
 
-snap.forEach(d=>{
+  snapshot.forEach(doc=>{
 
-let x=d.data();
+    let d=doc.data();
 
-html+=`
+    html+=`
 
-<div class="property-box">
+    <div class="property-box">
 
-<p>${x.name}</p>
-<p>${x.mobile}</p>
-<p>${x.message}</p>
+    <p>${d.name}</p>
+    <p>${d.mobile}</p>
+    <p>${d.message}</p>
 
-<a target="_blank"
-href="https://wa.me/91${x.mobile}">Reply</a>
+    <a href="https://wa.me/91${d.mobile}" target="_blank">
+    Reply
+    </a>
 
-</div>
+    </div>
 
-`;
+    `;
 
-});
+  });
 
-leadList.innerHTML=html;
+  if(el("leadList")){
+    el("leadList").innerHTML=html;
+  }
 
 });
 
 }
 
 
-/* BACKUP */
+/* ================= STATS ================= */
+
+function loadStats(){
+
+db.collection("properties")
+.get()
+.then(snap=>{
+
+  let sold=0, avail=0;
+
+  snap.forEach(d=>{
+
+    if(d.data().status==="Sold") sold++;
+    else avail++;
+
+  });
+
+  if(el("soldCount")) el("soldCount").innerText=sold;
+  if(el("availCount")) el("availCount").innerText=avail;
+
+});
+
+}
+
+
+/* ================= BACKUP ================= */
 
 function backupData(){
 
-db.collection("properties").get().then(snap=>{
+db.collection("properties")
+.get()
+.then(snap=>{
 
-let d=[];
+  let data=[];
 
-snap.forEach(x=>d.push(x.data()));
+  snap.forEach(d=> data.push(d.data()));
 
-let b=new Blob([JSON.stringify(d,null,2)]);
+  let blob=new Blob(
+    [JSON.stringify(data,null,2)],
+    {type:"application/json"}
+  );
 
-let a=document.createElement("a");
-
-a.href=URL.createObjectURL(b);
-a.download="backup.json";
-a.click();
+  let a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="backup.json";
+  a.click();
 
 });
 
 }
 
 
-/* LOGOUT */
+/* ================= LOGOUT ================= */
 
 function logout(){
 
+logActivity("Logout");
+
 auth.signOut().then(()=>{
-location="login.html";
+  window.location="login.html";
 });
 
 }
 
 </script>
-
-</body>
-</html>
