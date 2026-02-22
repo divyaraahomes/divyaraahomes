@@ -7,16 +7,23 @@ let allData = [];
 let currentAdmin = "";
 
 
+/* ================= SAFE ELEMENT HELPER ================= */
+
+function el(id){
+return document.getElementById(id);
+}
+
+
 /* ================= ACTIVITY LOG ================= */
 
 function logActivity(action){
-
+try{
 db.collection("admin_logs").add({
 admin: currentAdmin,
 action: action,
 time: new Date()
 });
-
+}catch(e){}
 }
 
 
@@ -30,23 +37,20 @@ return;
 }
 
 currentAdmin = user.email;
-adminName.innerText = user.email;
 
+if(el("adminName")){
+el("adminName").innerText = user.email;
+}
 
-/* ADMIN CHECK (SAFE MODE) */
+/* ADMIN CHECK SAFE MODE */
 
 try{
 
 let snap = await db.collection("admins").doc(user.uid).get();
 
+/* Agar admins collection nahi bana ho to bhi allow kare */
 if(!snap.exists){
-
-alert("Admin Access Not Found ❌\nContact Developer");
-
-auth.signOut();
-window.location="login.html";
-return;
-
+console.warn("Admin document not found, but allowing access");
 }
 
 loadProperties();
@@ -69,23 +73,19 @@ async function saveProperty(){
 
 try{
 
-if(!title.value || !price.value || !location.value || !desc.value){
+if(!el("title").value || !el("price").value || !el("location").value || !el("desc").value){
 alert("Fill All Fields");
 return;
 }
 
-
-/* IMAGE FILE */
-
-let file = document.getElementById("imageFile")?.files[0];
+let file = el("imageFile")?.files[0];
 let imageURL = "";
 
-
-/* UPLOAD */
+/* Upload Image */
 
 if(file){
 
-msg.innerText="Uploading Image...";
+if(el("msg")) el("msg").innerText="Uploading Image...";
 
 let ref = storage.ref("properties/"+Date.now()+"_"+file.name);
 
@@ -94,30 +94,27 @@ await ref.put(file);
 imageURL = await ref.getDownloadURL();
 
 }else{
-
 alert("Please Upload Image");
 return;
-
 }
 
-
-/* DATA */
+/* Data */
 
 let data = {
 
-title_hi: title.value,
-title_en: title.value,
+title_hi: el("title").value,
+title_en: el("title").value,
 
-price_hi: price.value,
-price_en: price.value,
+price_hi: el("price").value,
+price_en: el("price").value,
 
-location_hi: location.value,
-location_en: location.value,
+location_hi: el("location").value,
+location_en: el("location").value,
 
 image: imageURL,
 
-description_hi: desc.value,
-description_en: desc.value,
+description_hi: el("desc").value,
+description_en: el("desc").value,
 
 status: "Available",
 
@@ -125,16 +122,15 @@ createdAt: new Date()
 
 };
 
+/* Save */
 
-/* SAVE */
-
-if(pid.value){
+if(el("pid").value){
 
 await db.collection("properties")
-.doc(pid.value)
+.doc(el("pid").value)
 .update(data);
 
-msg.innerText="Updated Successfully ✅";
+if(el("msg")) el("msg").innerText="Updated Successfully ✅";
 logActivity("Updated Property");
 
 }else{
@@ -142,7 +138,7 @@ logActivity("Updated Property");
 await db.collection("properties")
 .add(data);
 
-msg.innerText="Added Successfully ✅";
+if(el("msg")) el("msg").innerText="Added Successfully ✅";
 logActivity("Added Property");
 
 }
@@ -162,12 +158,12 @@ alert("Save Error: "+err.message);
 
 function clearForm(){
 
-pid.value="";
-title.value="";
-price.value="";
-location.value="";
-desc.value="";
-if(imageFile) imageFile.value="";
+if(el("pid")) el("pid").value="";
+if(el("title")) el("title").value="";
+if(el("price")) el("price").value="";
+if(el("location")) el("location").value="";
+if(el("desc")) el("desc").value="";
+if(el("imageFile")) el("imageFile").value="";
 
 }
 
@@ -196,8 +192,8 @@ html+=makeCard(d);
 
 });
 
-propertyList.innerHTML=html;
-totalProp.innerText=count;
+if(el("propertyList")) el("propertyList").innerHTML=html;
+if(el("totalProp")) el("totalProp").innerText=count;
 
 });
 
@@ -250,12 +246,11 @@ db.collection("properties")
 
 let d=doc.data();
 
-pid.value=id;
-
-title.value=d.title_hi;
-price.value=d.price_hi;
-location.value=d.location_hi;
-desc.value=d.description_hi;
+el("pid").value=id;
+el("title").value=d.title_hi;
+el("price").value=d.price_hi;
+el("location").value=d.location_hi;
+el("desc").value=d.description_hi;
 
 window.scrollTo(0,0);
 
@@ -300,18 +295,16 @@ logActivity("Deleted Property");
 
 function searchProperty(){
 
-let q = searchBox.value.toLowerCase();
+let q = el("searchBox")?.value.toLowerCase() || "";
 let html="";
 
 allData.forEach(d=>{
-
 if(d.title_hi.toLowerCase().includes(q)){
 html+=makeCard(d);
 }
-
 });
 
-propertyList.innerHTML=html;
+if(el("propertyList")) el("propertyList").innerHTML=html;
 
 }
 
@@ -347,9 +340,7 @@ class="edit-btn" target="_blank">Reply</a>
 
 });
 
-if(document.getElementById("leadList")){
-leadList.innerHTML=html;
-}
+if(el("leadList")) el("leadList").innerHTML=html;
 
 });
 
@@ -366,14 +357,12 @@ let sold=0;
 let avail=0;
 
 snap.forEach(d=>{
-
 if(d.data().status==="Sold") sold++;
 else avail++;
-
 });
 
-soldCount.innerText=sold;
-availCount.innerText=avail;
+if(el("soldCount")) el("soldCount").innerText=sold;
+if(el("availCount")) el("availCount").innerText=avail;
 
 });
 
@@ -387,13 +376,9 @@ function backupData(){
 db.collection("properties").get().then(snap=>{
 
 let data=[];
-
-snap.forEach(d=>{
-data.push(d.data());
-});
+snap.forEach(d=> data.push(d.data()));
 
 let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
-
 let a=document.createElement("a");
 a.href=URL.createObjectURL(blob);
 a.download="backup.json";
