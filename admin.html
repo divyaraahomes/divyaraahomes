@@ -4,70 +4,104 @@
 
 const storage = firebase.storage();
 let allData = [];
+let currentAdmin = "";
+
+
+/* ================= ACTIVITY LOG ================= */
+
+function logActivity(action){
+
+db.collection("admin_logs").add({
+admin: currentAdmin,
+action: action,
+time: new Date()
+});
+
+}
+
 
 /* ================= AUTH CHECK ================= */
 
-auth.onAuthStateChanged(user=>{
+auth.onAuthStateChanged(async user=>{
 
 if(!user){
 window.location="login.html";
 return;
 }
 
+currentAdmin = user.email;
 adminName.innerText = user.email;
 
-/* Admin Role Check */
 
-db.collection("admins")
-.doc(user.uid)
-.get()
-.then(doc=>{
+/* ADMIN CHECK (SAFE MODE) */
 
-if(!doc.exists){
-alert("Not Authorized ❌");
+try{
+
+let snap = await db.collection("admins").doc(user.uid).get();
+
+if(!snap.exists){
+
+alert("Admin Access Not Found ❌\nContact Developer");
+
 auth.signOut();
 window.location="login.html";
-}else{
+return;
+
+}
+
 loadProperties();
 loadLeads();
+loadStats();
+logActivity("Login");
+
+}catch(err){
+
+alert("Auth Error: "+err.message);
+
 }
 
 });
 
-});
 
-
-/* ================= SAVE PROPERTY (WITH IMAGE UPLOAD) ================= */
+/* ================= SAVE PROPERTY ================= */
 
 async function saveProperty(){
 
-if(
-!title.value ||
-!price.value ||
-!location.value ||
-!desc.value
-){
+try{
+
+if(!title.value || !price.value || !location.value || !desc.value){
 alert("Fill All Fields");
 return;
 }
 
+
+/* IMAGE FILE */
+
 let file = document.getElementById("imageFile")?.files[0];
-let imageURL = image?.value || "";
+let imageURL = "";
+
+
+/* UPLOAD */
 
 if(file){
 
 msg.innerText="Uploading Image...";
 
 let ref = storage.ref("properties/"+Date.now()+"_"+file.name);
+
 await ref.put(file);
+
 imageURL = await ref.getDownloadURL();
 
+}else{
+
+alert("Please Upload Image");
+return;
+
 }
 
-if(!imageURL){
-alert("Add Image or Upload One");
-return;
-}
+
+/* DATA */
 
 let data = {
 
@@ -91,6 +125,9 @@ createdAt: new Date()
 
 };
 
+
+/* SAVE */
+
 if(pid.value){
 
 await db.collection("properties")
@@ -98,6 +135,7 @@ await db.collection("properties")
 .update(data);
 
 msg.innerText="Updated Successfully ✅";
+logActivity("Updated Property");
 
 }else{
 
@@ -105,10 +143,17 @@ await db.collection("properties")
 .add(data);
 
 msg.innerText="Added Successfully ✅";
+logActivity("Added Property");
 
 }
 
 clearForm();
+
+}catch(err){
+
+alert("Save Error: "+err.message);
+
+}
 
 }
 
@@ -159,7 +204,7 @@ totalProp.innerText=count;
 }
 
 
-/* ================= PROPERTY CARD ================= */
+/* ================= CARD ================= */
 
 function makeCard(d){
 
@@ -179,17 +224,11 @@ return `
 
 <div class="action-btns">
 
-<button class="edit-btn" onclick="editProperty('${d.id}')">
-Edit
-</button>
+<button class="edit-btn" onclick="editProperty('${d.id}')">Edit</button>
 
-<button class="edit-btn" onclick="changeStatus('${d.id}','Sold')">
-Mark Sold
-</button>
+<button class="edit-btn" onclick="changeStatus('${d.id}','Sold')">Sold</button>
 
-<button class="del-btn" onclick="deleteProperty('${d.id}')">
-Delete
-</button>
+<button class="del-btn" onclick="deleteProperty('${d.id}')">Delete</button>
 
 </div>
 
@@ -233,6 +272,10 @@ db.collection("properties")
 .doc(id)
 .update({status:status});
 
+logActivity("Status Changed");
+
+loadStats();
+
 }
 
 
@@ -245,6 +288,8 @@ if(confirm("Delete permanently?")){
 db.collection("properties")
 .doc(id)
 .delete();
+
+logActivity("Deleted Property");
 
 }
 
@@ -271,7 +316,7 @@ propertyList.innerHTML=html;
 }
 
 
-/* ================= LOAD LEADS ================= */
+/* ================= LEADS ================= */
 
 function loadLeads(){
 
@@ -303,8 +348,56 @@ class="edit-btn" target="_blank">Reply</a>
 });
 
 if(document.getElementById("leadList")){
-document.getElementById("leadList").innerHTML=html;
+leadList.innerHTML=html;
 }
+
+});
+
+}
+
+
+/* ================= STATS ================= */
+
+function loadStats(){
+
+db.collection("properties").get().then(snap=>{
+
+let sold=0;
+let avail=0;
+
+snap.forEach(d=>{
+
+if(d.data().status==="Sold") sold++;
+else avail++;
+
+});
+
+soldCount.innerText=sold;
+availCount.innerText=avail;
+
+});
+
+}
+
+
+/* ================= BACKUP ================= */
+
+function backupData(){
+
+db.collection("properties").get().then(snap=>{
+
+let data=[];
+
+snap.forEach(d=>{
+data.push(d.data());
+});
+
+let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+
+let a=document.createElement("a");
+a.href=URL.createObjectURL(blob);
+a.download="backup.json";
+a.click();
 
 });
 
@@ -314,6 +407,8 @@ document.getElementById("leadList").innerHTML=html;
 /* ================= LOGOUT ================= */
 
 function logout(){
+
+logActivity("Logout");
 
 auth.signOut().then(()=>{
 window.location="login.html";
