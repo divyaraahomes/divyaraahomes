@@ -1,22 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Divyaraa Homes - Trusted Real Estate in India. Buy plots, houses and land.">
-<meta name="keywords" content="real estate, plots, land, property in india, divyaraa homes">
-<meta name="author" content="Divyaraa Homes">
+
+<!-- BASIC -->
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>DIVYARAA HOMES | India's Trusted Real Estate Brand</title>
+<title>Divyaraa Homes | Buy Plots & Houses in India | Trusted Real Estate</title>
 
-<meta name="description" content="Buy & Sell Verified Properties with DIVYARAA HOMES. Trusted Real Estate Advisors in Uttar Pradesh.">
+<meta name="description" content="Divyaraa Homes is India's trusted real estate brand. Buy verified plots, houses & land in UP. Call now for free consultation.">
 
-<meta name="keywords" content="Divyaraa Homes, Real Estate Kanpur, Plot Buy Sell, Property UP, Farmhouse Land">
+<meta name="keywords" content="Divyaraa Homes, Real Estate India, Buy Plot Kanpur, Property UP, Land Investment, House Buy Sell">
 
 <meta name="author" content="Brijendra Singh Chakraborty">
 
+<meta name="robots" content="index, follow">
+
+<link rel="canonical" href="https://divyaraahomes.in/">
+
+<!-- SOCIAL PREVIEW -->
+
+<meta property="og:title" content="Divyaraa Homes - Trusted Real Estate in India">
+<meta property="og:description" content="Buy Verified Plots & Houses in UP. 100% Genuine Property Deals.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://divyaraahomes.in/">
+
+<meta name="twitter:card" content="summary_large_image">
+
+<!-- GOOGLE FONT -->
+
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- SCHEMA (BUSINESS DATA) -->
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "RealEstateAgent",
+  "name": "Divyaraa Homes",
+  "url": "https://divyaraahomes.in",
+  "telephone": "+917706917829",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Kanpur",
+    "addressRegion": "UP",
+    "addressCountry": "IN"
+  }
+}
+</script>
+
+<!-- STYLE -->
 
 <style>
 
@@ -46,7 +81,6 @@ color:gold;
 text-align:center;
 padding:12px;
 font-weight:600;
-letter-spacing:1.5px;
 z-index:9999;
 }
 
@@ -95,15 +129,13 @@ padding-top:110px;
 
 .hero h1{
 font-size:60px;
-letter-spacing:4px;
 color:gold;
-text-shadow:0 0 20px rgba(255,215,0,.8);
+text-shadow:0 0 20px gold;
 }
 
 .hero p{
 margin:10px 0;
 font-size:22px;
-opacity:.9;
 }
 
 .btn{
@@ -134,7 +166,6 @@ text-align:center;
 font-size:36px;
 margin-bottom:50px;
 color:gold;
-letter-spacing:1px;
 }
 
 /* GRID */
@@ -149,13 +180,12 @@ gap:30px;
 background:#020617;
 border-radius:18px;
 overflow:hidden;
-box-shadow:0 10px 30px rgba(0,0,0,.6);
-transition:.4s;
 border:1px solid #111;
+transition:.4s;
 }
 
 .card:hover{
-transform:translateY(-12px);
+transform:translateY(-10px);
 border-color:gold;
 }
 
@@ -171,47 +201,9 @@ padding:22px;
 
 /* ABOUT */
 
-.about{
+.about,.founder,.testimonial,.contact{
 background:#020617;
 text-align:center;
-}
-
-.about p{
-max-width:850px;
-margin:auto;
-line-height:1.9;
-font-size:17px;
-}
-
-/* FOUNDER */
-
-.founder{
-background:#020617;
-text-align:center;
-}
-
-.founder img{
-width:180px;
-height:180px;
-border-radius:50%;
-border:6px solid gold;
-box-shadow:0 0 30px rgba(255,215,0,0.9);
-object-fit:cover;
-margin:25px 0;
-}
-
-/* TESTIMONIAL */
-
-.testimonial{
-background:#020617;
-text-align:center;
-}
-
-.review{
-background:#000;
-padding:25px;
-border-radius:12px;
-border:1px solid #222;
 }
 
 /* MAP */
@@ -223,20 +215,14 @@ border-radius:18px;
 border:2px solid gold;
 }
 
-/* CONTACT */
+/* FORM */
 
-.contact{
-text-align:center;
-background:#020617;
-}
-
-input, textarea{
+input,textarea{
 width:100%;
 padding:13px;
 margin:10px 0;
 border-radius:6px;
 border:none;
-outline:none;
 font-size:15px;
 }
 
@@ -260,7 +246,6 @@ padding:14px;
 border-radius:50%;
 color:white;
 z-index:999;
-box-shadow:0 0 15px rgba(0,0,0,.6);
 }
 
 .whatsapp{right:20px;background:#25D366;}
@@ -275,7 +260,7 @@ box-shadow:0 0 15px rgba(0,0,0,.6);
 <!-- TOP -->
 
 <div class="topbar">
-DIVYARAA HOMES – India's Trusted Real Estate Brand
+DIVYARAA HOMES – Trusted Property Advisors
 </div>
 
 <!-- NAV -->
@@ -285,7 +270,6 @@ DIVYARAA HOMES – India's Trusted Real Estate Brand
 <a href="#properties">Properties</a>
 <a href="#about">About</a>
 <a href="#founder">Founder</a>
-<a href="#reviews">Reviews</a>
 <a href="#contact">Contact</a>
 </nav>
 
@@ -295,11 +279,11 @@ DIVYARAA HOMES – India's Trusted Real Estate Brand
 
 <h1>DIVYARAA HOMES</h1>
 
-<p>Kanpur | Lucknow | Fatehpur | Banda | Hamirpur</p>
+<p>Kanpur | Lucknow | Banda | Hamirpur</p>
 
-<p>Premium Property | Investment | Advisory</p>
+<p>Verified Property | Safe Investment</p>
 
-<a href="#contact" class="btn">Get Free Consultation</a>
+<a href="#contact" class="btn">Free Consultation</a>
 
 </div>
 
@@ -329,15 +313,6 @@ DIVYARAA HOMES – India's Trusted Real Estate Brand
 </div>
 </div>
 
-<div class="card">
-<img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c">
-<div class="card-content">
-<h3>Commercial Land – NH34</h3>
-<p>₹35 Lakh / Bigha</p>
-<a href="https://wa.me/917706917829" class="btn">Enquire</a>
-</div>
-</div>
-
 </div>
 
 </section>
@@ -346,16 +321,10 @@ DIVYARAA HOMES – India's Trusted Real Estate Brand
 
 <section class="about" id="about">
 
-<h2 class="section-title">About DIVYARAA HOMES</h2>
+<h2 class="section-title">About Us</h2>
 
 <p>
-
-DIVYARAA HOMES is a premium real estate advisory brand focused on trust, transparency and value creation.
-
-<br><br>
-
-We deliver verified properties, legal assistance, and long-term investment support.
-
+Divyaraa Homes provides verified properties with legal support and full transparency.
 </p>
 
 </section>
@@ -364,39 +333,13 @@ We deliver verified properties, legal assistance, and long-term investment suppo
 
 <section class="founder" id="founder">
 
-<h2 class="section-title">Founder & Vision</h2>
+<h2 class="section-title">Founder</h2>
 
-<img src="founder.jpg">
+<img src="founder.jpg" width="180">
 
 <h3>Brijendra Singh Chakraborty</h3>
 
-<p>
-
-Founder & Chief Property Advisor
-
-<br><br>
-
-Vision: Creating India's most trusted real estate ecosystem.
-
-</p>
-
-</section>
-
-<!-- REVIEWS -->
-
-<section class="testimonial" id="reviews">
-
-<h2 class="section-title">Client Testimonials</h2>
-
-<div class="grid">
-
-<div class="review">"Very professional and transparent service."</div>
-
-<div class="review">"100% genuine property guidance."</div>
-
-<div class="review">"Best real estate advisor in UP."</div>
-
-</div>
+<p>Founder & Chief Advisor</p>
 
 </section>
 
@@ -404,7 +347,7 @@ Vision: Creating India's most trusted real estate ecosystem.
 
 <section class="map">
 
-<h2 class="section-title">Our Location</h2>
+<h2 class="section-title">Office Location</h2>
 
 <iframe src="https://www.google.com/maps?q=Naubasta%20Kanpur&output=embed"></iframe>
 
@@ -414,21 +357,18 @@ Vision: Creating India's most trusted real estate ecosystem.
 
 <section class="contact" id="contact">
 
-<h2 class="section-title">Contact Us</h2>
+<h2 class="section-title">Contact</h2>
 
-<p>📞 7706917829 / 7755864651</p>
-
+<p>📞 7706917829</p>
 <p>📧 divyaraahomes@gmail.com</p>
 
 <form action="https://wa.me/917706917829">
 
-<input type="text" placeholder="Your Name" required>
+<input type="text" placeholder="Name" required>
+<input type="text" placeholder="Mobile" required>
+<textarea placeholder="Requirement"></textarea>
 
-<input type="text" placeholder="Mobile Number" required>
-
-<textarea rows="4" placeholder="Your Requirement"></textarea>
-
-<button class="btn">Send on WhatsApp</button>
+<button class="btn">Send WhatsApp</button>
 
 </form>
 
@@ -438,14 +378,13 @@ Vision: Creating India's most trusted real estate ecosystem.
 
 <footer>
 
-© 2026 DIVYARAA HOMES | All Rights Reserved | Powered by Trust
+© 2026 Divyaraa Homes | All Rights Reserved
 
 </footer>
 
 <!-- FLOAT -->
 
 <a href="https://wa.me/917706917829" class="whatsapp">💬</a>
-
 <a href="tel:+917706917829" class="call">📞</a>
 
 </body>
