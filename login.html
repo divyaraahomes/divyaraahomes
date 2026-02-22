@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Login | Divyaraa Homes</title>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+<style>
+body{
+font-family:Arial;
+background:#050816;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.box{
+background:#020617;
+padding:30px;
+border-radius:10px;
+width:300px;
+text-align:center;
+}
+
+input{
+width:100%;
+padding:10px;
+margin:10px 0;
+border:none;
+border-radius:5px;
+}
+
+button{
+background:gold;
+border:none;
+padding:10px;
+width:100%;
+font-weight:bold;
+cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+<h2>Admin Login</h2>
+
+<input type="email" id="email" placeholder="Email">
+<input type="password" id="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+
+<p id="msg"></p>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDdpuNucflUlnN5FZy9EV8wxgZy041mxWc",
+  authDomain: "divyaraa-homes.firebaseapp.com",
+  projectId: "divyaraa-homes",
+  storageBucket: "divyaraa-homes.firebasestorage.app",
+  messagingSenderId: "135741152456",
+  appId: "1:135741152456:web:7fb6ad26eb72e8ccf959fd"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+function login(){
+
+var email=document.getElementById("email").value;
+var pass=document.getElementById("password").value;
+
+firebase.auth().signInWithEmailAndPassword(email,pass)
+.then(()=>{
+window.location="admin.html";
+})
+.catch((e)=>{
+document.getElementById("msg").innerText=e.message;
+});
+}
+</script>
+
+</body>
+</html>
