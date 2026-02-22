@@ -1,232 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<title>Admin Panel | Divyaraa Homes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<!-- FIREBASE SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDdpuNucflUlnN5FZy9EV8wxgZy041mxWc",
+  authDomain: "divyaraa-homes.firebaseapp.com",
+  projectId: "divyaraa-homes",
+  storageBucket: "divyaraa-homes.appspot.com"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+const storage = firebase.storage();
+</script>
+
+<style>
+
+body{
+margin:0;
+font-family:Poppins,sans-serif;
+background:#050816;
+color:white;
+}
+
+header{
+background:black;
+color:gold;
+padding:15px;
+text-align:center;
+font-size:20px;
+}
+
+.logout{
+float:right;
+background:red;
+color:white;
+padding:6px 12px;
+border-radius:4px;
+cursor:pointer;
+}
+
+.container{
+max-width:1000px;
+margin:auto;
+padding:25px;
+}
+
+input,textarea{
+width:100%;
+padding:10px;
+margin:6px 0;
+border-radius:5px;
+border:none;
+}
+
+button{
+background:gold;
+border:none;
+padding:10px 20px;
+font-weight:600;
+cursor:pointer;
+border-radius:5px;
+}
+
+.property-box{
+background:#111;
+padding:15px;
+margin-top:15px;
+border-radius:8px;
+border:1px solid #222;
+}
+
+.property-box img{
+width:100%;
+max-height:200px;
+object-fit:cover;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+Admin Panel - Divyaraa Homes
+<span class="logout" onclick="logout()">Logout</span>
+</header>
+
+<div class="container">
+
+<h3 id="adminName"></h3>
+
+<h2>Add Property</h2>
+
+<input type="hidden" id="pid">
+
+<input id="title" placeholder="Title">
+<input id="price" placeholder="Price">
+<input id="location" placeholder="Location">
+
+<input type="file" id="imageFile">
+
+<textarea id="desc" placeholder="Description"></textarea>
+
+<button onclick="saveProperty()">Save</button>
+
+<p id="msg"></p>
+
+<hr>
+
+<input id="searchBox" placeholder="Search..." onkeyup="searchProperty()">
+
+<h2>All Properties (<span id="totalProp">0</span>)</h2>
+
+<div id="propertyList"></div>
+
+<h2>Leads</h2>
+
+<div id="leadList"></div>
+
+<br>
+
+<button onclick="backupData()">Backup</button>
+
+</div>
+
+
 <script>
 
-/* ================= INIT ================= */
-
-const storage = firebase.storage();
-let allData = [];
-let currentAdmin = "";
+let allData=[];
 
 
-/* ================= SAFE ELEMENT HELPER ================= */
+/* AUTH */
 
-function el(id){
-return document.getElementById(id);
-}
-
-
-/* ================= ACTIVITY LOG ================= */
-
-function logActivity(action){
-try{
-db.collection("admin_logs").add({
-admin: currentAdmin,
-action: action,
-time: new Date()
-});
-}catch(e){}
-}
-
-
-/* ================= AUTH CHECK ================= */
-
-auth.onAuthStateChanged(async user=>{
+auth.onAuthStateChanged(user=>{
 
 if(!user){
-window.location="login.html";
+location="login.html";
 return;
 }
 
-currentAdmin = user.email;
-
-if(el("adminName")){
-el("adminName").innerText = user.email;
-}
-
-/* ADMIN CHECK SAFE MODE */
-
-try{
-
-let snap = await db.collection("admins").doc(user.uid).get();
-
-/* Agar admins collection nahi bana ho to bhi allow kare */
-if(!snap.exists){
-console.warn("Admin document not found, but allowing access");
-}
+adminName.innerText = "Logged in: " + user.email;
 
 loadProperties();
 loadLeads();
-loadStats();
-logActivity("Login");
-
-}catch(err){
-
-alert("Auth Error: "+err.message);
-
-}
 
 });
 
 
-/* ================= SAVE PROPERTY ================= */
+/* SAVE */
 
 async function saveProperty(){
 
 try{
 
-if(!el("title").value || !el("price").value || !el("location").value || !el("desc").value){
-alert("Fill All Fields");
+if(!title.value||!price.value||!location.value||!desc.value){
+alert("Fill all fields");
 return;
 }
 
-let file = el("imageFile")?.files[0];
-let imageURL = "";
+let file=imageFile.files[0];
 
-/* Upload Image */
+if(!file){
+alert("Upload image");
+return;
+}
 
-if(file){
+msg.innerText="Uploading...";
 
-if(el("msg")) el("msg").innerText="Uploading Image...";
-
-let ref = storage.ref("properties/"+Date.now()+"_"+file.name);
+let ref=storage.ref("properties/"+Date.now()+"_"+file.name);
 
 await ref.put(file);
 
-imageURL = await ref.getDownloadURL();
+let url=await ref.getDownloadURL();
 
-}else{
-alert("Please Upload Image");
-return;
-}
+let data={
 
-/* Data */
-
-let data = {
-
-title_hi: el("title").value,
-title_en: el("title").value,
-
-price_hi: el("price").value,
-price_en: el("price").value,
-
-location_hi: el("location").value,
-location_en: el("location").value,
-
-image: imageURL,
-
-description_hi: el("desc").value,
-description_en: el("desc").value,
-
-status: "Available",
-
-createdAt: new Date()
+title_hi:title.value,
+price_hi:price.value,
+location_hi:location.value,
+image:url,
+description_hi:desc.value,
+status:"Available",
+createdAt:new Date()
 
 };
 
-/* Save */
+if(pid.value){
 
-if(el("pid").value){
-
-await db.collection("properties")
-.doc(el("pid").value)
-.update(data);
-
-if(el("msg")) el("msg").innerText="Updated Successfully ✅";
-logActivity("Updated Property");
+await db.collection("properties").doc(pid.value).update(data);
+msg.innerText="Updated ✅";
 
 }else{
 
-await db.collection("properties")
-.add(data);
-
-if(el("msg")) el("msg").innerText="Added Successfully ✅";
-logActivity("Added Property");
+await db.collection("properties").add(data);
+msg.innerText="Added ✅";
 
 }
 
 clearForm();
 
-}catch(err){
-
-alert("Save Error: "+err.message);
-
+}catch(e){
+alert(e.message);
 }
 
 }
 
 
-/* ================= CLEAR FORM ================= */
+/* CLEAR */
 
 function clearForm(){
 
-if(el("pid")) el("pid").value="";
-if(el("title")) el("title").value="";
-if(el("price")) el("price").value="";
-if(el("location")) el("location").value="";
-if(el("desc")) el("desc").value="";
-if(el("imageFile")) el("imageFile").value="";
+pid.value="";
+title.value="";
+price.value="";
+location.value="";
+desc.value="";
+imageFile.value="";
 
 }
 
 
-/* ================= LOAD PROPERTIES ================= */
+/* LOAD */
 
 function loadProperties(){
 
 db.collection("properties")
 .orderBy("createdAt","desc")
-.onSnapshot(snapshot=>{
+.onSnapshot(snap=>{
 
 let html="";
 allData=[];
-let count=0;
+let c=0;
 
-snapshot.forEach(doc=>{
+snap.forEach(d=>{
 
-let d=doc.data();
-d.id=doc.id;
+let x=d.data();
+x.id=d.id;
 
-allData.push(d);
-count++;
+allData.push(x);
+c++;
 
-html+=makeCard(d);
+html+=card(x);
 
 });
 
-if(el("propertyList")) el("propertyList").innerHTML=html;
-if(el("totalProp")) el("totalProp").innerText=count;
+propertyList.innerHTML=html;
+totalProp.innerText=c;
 
 });
 
 }
 
 
-/* ================= CARD ================= */
+/* CARD */
 
-function makeCard(d){
+function card(d){
 
-return `
+return`
 
 <div class="property-box">
 
 <h3>${d.title_hi}</h3>
 
-<p><b>Status:</b> ${d.status}</p>
-<p><b>Price:</b> ${d.price_hi}</p>
-<p><b>Location:</b> ${d.location_hi}</p>
+<p>${d.price_hi}</p>
+<p>${d.location_hi}</p>
 
-<img src="${d.image}" loading="lazy">
+<img src="${d.image}">
 
 <p>${d.description_hi}</p>
 
-<div class="action-btns">
+<button onclick="edit('${d.id}')">Edit</button>
 
-<button class="edit-btn" onclick="editProperty('${d.id}')">Edit</button>
-
-<button class="edit-btn" onclick="changeStatus('${d.id}','Sold')">Sold</button>
-
-<button class="del-btn" onclick="deleteProperty('${d.id}')">Delete</button>
-
-</div>
+<button onclick="del('${d.id}')">Delete</button>
 
 </div>
 
@@ -235,104 +297,84 @@ return `
 }
 
 
-/* ================= EDIT ================= */
+/* EDIT */
 
-function editProperty(id){
+function edit(id){
 
-db.collection("properties")
-.doc(id)
-.get()
-.then(doc=>{
+db.collection("properties").doc(id).get().then(d=>{
 
-let d=doc.data();
+let x=d.data();
 
-el("pid").value=id;
-el("title").value=d.title_hi;
-el("price").value=d.price_hi;
-el("location").value=d.location_hi;
-el("desc").value=d.description_hi;
+pid.value=id;
+title.value=x.title_hi;
+price.value=x.price_hi;
+location.value=x.location_hi;
+desc.value=x.description_hi;
 
-window.scrollTo(0,0);
+scrollTo(0,0);
 
 });
 
 }
 
 
-/* ================= STATUS ================= */
+/* DELETE */
 
-function changeStatus(id,status){
+function del(id){
 
-db.collection("properties")
-.doc(id)
-.update({status:status});
+if(confirm("Delete?")){
 
-logActivity("Status Changed");
-
-loadStats();
-
-}
-
-
-/* ================= DELETE ================= */
-
-function deleteProperty(id){
-
-if(confirm("Delete permanently?")){
-
-db.collection("properties")
-.doc(id)
-.delete();
-
-logActivity("Deleted Property");
+db.collection("properties").doc(id).delete();
 
 }
 
 }
 
 
-/* ================= SEARCH ================= */
+/* SEARCH */
 
 function searchProperty(){
 
-let q = el("searchBox")?.value.toLowerCase() || "";
+let q=searchBox.value.toLowerCase();
 let html="";
 
 allData.forEach(d=>{
+
 if(d.title_hi.toLowerCase().includes(q)){
-html+=makeCard(d);
+html+=card(d);
 }
+
 });
 
-if(el("propertyList")) el("propertyList").innerHTML=html;
+propertyList.innerHTML=html;
 
 }
 
 
-/* ================= LEADS ================= */
+/* LEADS */
 
 function loadLeads(){
 
 db.collection("leads")
 .orderBy("time","desc")
-.onSnapshot(snapshot=>{
+.onSnapshot(snap=>{
 
 let html="";
 
-snapshot.forEach(doc=>{
+snap.forEach(d=>{
 
-let d=doc.data();
+let x=d.data();
 
 html+=`
 
 <div class="property-box">
 
-<p><b>Name:</b> ${d.name}</p>
-<p><b>Mobile:</b> ${d.mobile}</p>
-<p><b>Message:</b> ${d.message}</p>
+<p>${x.name}</p>
+<p>${x.mobile}</p>
+<p>${x.message}</p>
 
-<a href="https://wa.me/91${d.mobile}" 
-class="edit-btn" target="_blank">Reply</a>
+<a target="_blank"
+href="https://wa.me/91${x.mobile}">Reply</a>
 
 </div>
 
@@ -340,47 +382,28 @@ class="edit-btn" target="_blank">Reply</a>
 
 });
 
-if(el("leadList")) el("leadList").innerHTML=html;
+leadList.innerHTML=html;
 
 });
 
 }
 
 
-/* ================= STATS ================= */
-
-function loadStats(){
-
-db.collection("properties").get().then(snap=>{
-
-let sold=0;
-let avail=0;
-
-snap.forEach(d=>{
-if(d.data().status==="Sold") sold++;
-else avail++;
-});
-
-if(el("soldCount")) el("soldCount").innerText=sold;
-if(el("availCount")) el("availCount").innerText=avail;
-
-});
-
-}
-
-
-/* ================= BACKUP ================= */
+/* BACKUP */
 
 function backupData(){
 
 db.collection("properties").get().then(snap=>{
 
-let data=[];
-snap.forEach(d=> data.push(d.data()));
+let d=[];
 
-let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+snap.forEach(x=>d.push(x.data()));
+
+let b=new Blob([JSON.stringify(d,null,2)]);
+
 let a=document.createElement("a");
-a.href=URL.createObjectURL(blob);
+
+a.href=URL.createObjectURL(b);
 a.download="backup.json";
 a.click();
 
@@ -389,16 +412,17 @@ a.click();
 }
 
 
-/* ================= LOGOUT ================= */
+/* LOGOUT */
 
 function logout(){
 
-logActivity("Logout");
-
 auth.signOut().then(()=>{
-window.location="login.html";
+location="login.html";
 });
 
 }
 
 </script>
+
+</body>
+</html>
